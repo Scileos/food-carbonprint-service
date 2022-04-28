@@ -13,5 +13,5 @@ type FoodCarbonController struct {
 //Init ... Initialize user routes
 func (c *FoodCarbonController) Init(router *gin.Engine) {
 	router.POST("/api/carbonPrint/basket", c.FoodCarbonService.GetCarbonPrintForBasket)
-	//router.GET("/api/carbonPrint/item/:itemName", c.FoodCarbonService.GetCarbonPrintForItem)
+	router.GET("/api/carbonPrint/item/:itemName", c.FoodCarbonService.GetCarbonPrintForItem)
 }

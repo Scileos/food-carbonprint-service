@@ -42,3 +42,15 @@ func (fc FoodCarbonService) GetCarbonPrintForBasket(ctx *gin.Context) {
 		ctx.JSON(200, responses.BasketCarbonPrint{Items: basketCarbonPrint.Items, Total: basketCarbonPrint.Total})
 	}
 }
+
+//GetCarbonPrintForItem ... With an injected data access repo, get the carbon print value for a given item
+func (fc FoodCarbonService) GetCarbonPrintForItem(ctx *gin.Context) {
+	itemName := ctx.Param("itemName")
+
+	itemCarbonPrint, err := fc.repo.GetCarbonPrintForItem(itemName)
+	if err != nil {
+		ctx.JSON(500, ctx.Error(err))
+	} else {
+		ctx.JSON(200, responses.ItemCarbonPrint{Name: itemCarbonPrint.Name, CarbonPrint: itemCarbonPrint.CarbonPrint})
+	}
+}

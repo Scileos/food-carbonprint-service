@@ -9,6 +9,7 @@ import (
 //IFoodCarbonRepository ... FoodCarbonRepository interface
 type IFoodCarbonRepository interface {
 	GetCarbonPrintForBasket(items []string) (BasketCarbonPrintModel, error)
+	GetCarbonPrintForItem(itemName string) (shared.ItemCarbonPrint, error)
 }
 
 //FoodCarbonRepository ... FoodCarbonRepository type
@@ -30,16 +31,30 @@ func NewFoodCarbonRepository(foodCarbonPrintConfig *config.FoodCarbonConfig) *Fo
 //GetCarbonPrintForBasket ... Method to return a detailed carbon print model for given items
 //Items not found will return -1 carbon value
 func (f FoodCarbonRepository) GetCarbonPrintForBasket(items []string) (basketCarbonPrint BasketCarbonPrintModel, err error) {
-	response := BasketCarbonPrintModel{}
 	for _, item := range items {
 		value := gjson.Get(f.FoodCarbonPrintConfig.CarbonValues, item)
 		if value.Exists() {
-			response.Items = append(response.Items, shared.ItemCarbonPrint{Name: item, CarbonPrint: value.Int()})
-			response.Total = response.Total + value.Int()
+			basketCarbonPrint.Items = append(basketCarbonPrint.Items, shared.ItemCarbonPrint{Name: item, CarbonPrint: value.Int()})
+			basketCarbonPrint.Total = basketCarbonPrint.Total + value.Int()
 		} else {
-			response.Items = append(response.Items, shared.ItemCarbonPrint{Name: item, CarbonPrint: -1})
+			basketCarbonPrint.Items = append(basketCarbonPrint.Items, shared.ItemCarbonPrint{Name: item, CarbonPrint: -1})
 		}
 	}
 
-	return response, nil
+	return basketCarbonPrint, nil
+}
+
+//GetCarbonPrintForItem ... Method to return a detailed carbon print model for a given item
+//Items not found will return -1 carbon value
+func (f FoodCarbonRepository) GetCarbonPrintForItem(itemName string) (itemCarbonPrint shared.ItemCarbonPrint, err error) {
+	itemCarbonPrint.Name = itemName
+
+	value := gjson.Get(f.FoodCarbonPrintConfig.CarbonValues, itemName)
+	if value.Exists() {
+		itemCarbonPrint.CarbonPrint = value.Int()
+	} else {
+		itemCarbonPrint.CarbonPrint = -1
+	}
+
+	return itemCarbonPrint, nil
 }
